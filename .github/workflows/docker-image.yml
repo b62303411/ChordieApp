@@ -1,0 +1,24 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag b62303411/chordie:${{ github.sha }} --tag b62303411/chordie:latest
+    - name: Push the Docker image
+      run: docker push b62303411/chordie:${{github.sha}}
+    - name: Push the Docker image
+      run: docker push b62303411/chordie:latest
